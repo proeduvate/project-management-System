@@ -26,6 +26,27 @@ from plane.utils.url import is_valid_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Load .env file automatically if present
+for _env_candidate in [
+    os.path.join(os.path.dirname(BASE_DIR), ".env"),
+    os.path.join(BASE_DIR, ".env"),
+]:
+    if os.path.exists(_env_candidate):
+        try:
+            with open(_env_candidate, "r", encoding="utf-8") as _f:
+                for _line in _f:
+                    _line = _line.strip()
+                    if not _line or _line.startswith("#") or "=" not in _line:
+                        continue
+                    _k, _v = _line.split("=", 1)
+                    _k = _k.strip()
+                    _v = _v.strip().strip("'\"")
+                    if _k not in os.environ and _v:
+                        os.environ[_k] = _v
+            break
+        except OSError:
+            pass
+
 _logger = logging.getLogger("plane")
 
 # Secret Key — use `or` so an explicitly empty env var is treated the same as unset,
