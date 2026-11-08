@@ -1,0 +1,49 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "admin": {
+      "root": "apps/admin",
+      "framework": "react-router"
+    },
+    "api": {
+      "root": "apps/api",
+      "framework": "django"
+    },
+    "live": {
+      "root": "apps/live",
+      "framework": "express"
+    },
+    "space": {
+      "root": "apps/space",
+      "framework": "react-router"
+    },
+    "web": {
+      "root": "apps/web",
+      "framework": "react-router"
+    },
+    "editor": {
+      "root": "packages/editor",
+      "runtime": "node"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/admin/(.*)",
+      "destination": {
+        "service": "admin"
+      }
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "web"
+      }
+    }
+  ]
+}
