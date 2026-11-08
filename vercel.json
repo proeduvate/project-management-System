@@ -20,10 +20,6 @@
     "web": {
       "root": "apps/web",
       "framework": "react-router"
-    },
-    "editor": {
-      "root": "packages/editor",
-      "runtime": "node"
     }
   },
   "rewrites": [
