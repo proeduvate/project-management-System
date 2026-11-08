@@ -22,10 +22,36 @@ SCOUT_MONITOR = os.environ.get("SCOUT_MONITOR", False)
 SCOUT_KEY = os.environ.get("SCOUT_KEY", "")
 SCOUT_NAME = "Plane"
 
-LOG_DIR = os.path.join(BASE_DIR, "logs")  # noqa
+IS_SERVERLESS = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+LOG_DIR = os.environ.get("LOG_DIR") or ("/tmp/logs" if IS_SERVERLESS else os.path.join(BASE_DIR, "logs"))  # noqa
 
-if not os.path.exists(LOG_DIR):
-    os.makedirs(LOG_DIR)
+if not IS_SERVERLESS:
+    try:
+        if not os.path.exists(LOG_DIR):
+            os.makedirs(LOG_DIR, exist_ok=True)
+    except OSError:
+        LOG_DIR = "/tmp/logs"
+        try:
+            if not os.path.exists(LOG_DIR):
+                os.makedirs(LOG_DIR, exist_ok=True)
+        except OSError:
+            IS_SERVERLESS = True
+
+if IS_SERVERLESS:
+    file_handler = {
+        "class": "logging.NullHandler",
+    }
+else:
+    file_handler = {
+        "class": "plane.utils.logging.SizedTimedRotatingFileHandler",
+        "filename": os.path.join(LOG_DIR, "plane-debug.log" if DEBUG else "plane-error.log"),  # noqa
+        "when": "s",
+        "maxBytes": 1024 * 1024 * 1,
+        "interval": 1,
+        "backupCount": 5,
+        "formatter": "json",
+        "level": "DEBUG" if DEBUG else "ERROR",
+    }
 
 # Logging configuration
 LOGGING = {
@@ -44,20 +70,7 @@ LOGGING = {
             "formatter": "json",
             "level": "INFO",
         },
-        "file": {
-            "class": "plane.utils.logging.SizedTimedRotatingFileHandler",
-            "filename": (
-                os.path.join(BASE_DIR, "logs", "plane-debug.log")  # noqa
-                if DEBUG
-                else os.path.join(BASE_DIR, "logs", "plane-error.log")  # noqa
-            ),
-            "when": "s",
-            "maxBytes": 1024 * 1024 * 1,
-            "interval": 1,
-            "backupCount": 5,
-            "formatter": "json",
-            "level": "DEBUG" if DEBUG else "ERROR",
-        },
+        "file": file_handler,
     },
     "loggers": {
         "plane.api.request": {
