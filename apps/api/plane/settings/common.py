@@ -388,10 +388,20 @@ RABBITMQ_VHOST = os.environ.get("RABBITMQ_VHOST", "/")
 AMQP_URL = os.environ.get("AMQP_URL")
 
 # Celery Configuration
-if AMQP_URL:
+if os.environ.get("CELERY_BROKER_URL"):
+    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+elif AMQP_URL:
     CELERY_BROKER_URL = AMQP_URL
+elif REDIS_URL:
+    CELERY_BROKER_URL = REDIS_URL
 else:
     CELERY_BROKER_URL = f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}:{RABBITMQ_PORT}/{RABBITMQ_VHOST}"
+
+# When running in serverless (Vercel) or when no dedicated Celery worker is configured,
+# execute tasks eagerly in-process so tasks (such as workspace seeding) don't require an external broker or worker daemon.
+_default_eager = "1" if (os.environ.get("VERCEL") or not (AMQP_URL or os.environ.get("USE_CELERY_WORKER") == "1")) else "0"
+CELERY_TASK_ALWAYS_EAGER = os.environ.get("CELERY_TASK_ALWAYS_EAGER", _default_eager) in ("1", "true", "True")
+CELERY_TASK_EAGER_PROPAGATES = os.environ.get("CELERY_TASK_EAGER_PROPAGATES", "0") in ("1", "true", "True")
 
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_SERIALIZER = "json"
