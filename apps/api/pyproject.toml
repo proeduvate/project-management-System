@@ -114,9 +114,9 @@ test = [
 ]
 
 [tool.uv]
-# Every uv that touches uv.lock is this exact version: CI reads it via
-# setup-uv's version-file, and the Dockerfiles pin the same image. Bump all together.
-required-version = "==0.12.21"
+# Every uv that touches uv.lock must satisfy this version: CI reads it via
+# setup-uv's version-file, and the Dockerfiles pin the same image.
+required-version = ">=0.12.21"
 # The API is a Django app, not an installable package: uv only manages its
 # environment and never builds or installs the project itself.
 package = false
