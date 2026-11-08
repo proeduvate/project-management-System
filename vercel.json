@@ -24,13 +24,79 @@
   },
   "rewrites": [
     {
+      "source": "/auth/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/auth",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/api",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/spaces/(.*)",
+      "destination": {
+        "service": "space"
+      }
+    },
+    {
+      "source": "/spaces",
+      "destination": {
+        "service": "space"
+      }
+    },
+    {
+      "source": "/god-mode/(.*)",
+      "destination": {
+        "service": "admin"
+      }
+    },
+    {
+      "source": "/god-mode",
+      "destination": {
+        "service": "admin"
+      }
+    },
+    {
       "source": "/admin/(.*)",
       "destination": {
         "service": "admin"
       }
     },
     {
-      "source": "/api/(.*)",
+      "source": "/admin",
+      "destination": {
+        "service": "admin"
+      }
+    },
+    {
+      "source": "/live/(.*)",
+      "destination": {
+        "service": "live"
+      }
+    },
+    {
+      "source": "/live",
+      "destination": {
+        "service": "live"
+      }
+    },
+    {
+      "source": "/static/(.*)",
       "destination": {
         "service": "api"
       }
